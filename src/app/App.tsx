@@ -1,12 +1,10 @@
-import Home from '../pages/Home';
-import PageLayout from '../components/layout-wrapper';
-
-function App() {
+import { HomePage } from "@/pages/home"
+const App = () => {
   return (
-    <PageLayout>
-      <Home title="Home"/>
-    </PageLayout>
-  )
-}
+    <div className="App">
+      <HomePage />
+    </div>
+  );
+};
 
-export default App
+export default App;
