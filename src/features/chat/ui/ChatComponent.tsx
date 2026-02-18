@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, User, Bot, Sparkles, MessageSquare, X, Minimize2 } from 'lucide-react';
+import { Send, Bot, Sparkles, MessageSquare, X, Minimize2 } from 'lucide-react';
 
 /**
  * PERSONAL WEBSITE: Nishan Shashintha
