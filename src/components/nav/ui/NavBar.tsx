@@ -10,7 +10,7 @@ export function NavBar({ isDarkMode, setIsDarkMode, view, setView }: { isDarkMod
             NISHAN SHASHINTHA
           </h1>
         </div>
-        
+
         <div className="flex items-center gap-6">
           {/* THEME & MODE CONTROLS */}
           <div className={`flex items-center gap-4 p-1.5 rounded-2xl border ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/5 border-black/5'}`}>

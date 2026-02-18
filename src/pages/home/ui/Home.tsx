@@ -7,6 +7,7 @@ import {
 import { HeroSection } from '@/components/hero';
 import { NavBar } from '@/components/nav';
 import { ContactMe } from '@/features/contact-me';
+import { Chat } from '@/features/chat';
 
 const themes: Record<string, {
     primary: string;
@@ -52,66 +53,80 @@ const HomePage = () => {
       <NavBar isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} view={view} setView={setView} />
 
       <AnimatePresence mode="wait">
-  {view === 'landing' ? (
-    <HeroSection 
-      isDarkMode={isDarkMode} 
-      t={t} 
-      prompt={prompt} 
-      setPrompt={setPrompt} 
-      handleExecute={handleExecute} 
-    />
-  ) : (
-    <motion.main 
-      key="results"
-      initial={{ opacity: 0, y: 50 }} 
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -50 }}
-      className="pt-40 pb-32 flex flex-col items-center px-6"
-    >
-      <div className="w-full max-w-3xl space-y-16">
-        
-        {/* DYNAMIC CONTENT RENDERER */}
-        {(() => {
-          const query = prompt.toLowerCase();
+        {view === 'landing' ? (
+          <HeroSection 
+            isDarkMode={isDarkMode} 
+            t={t} 
+            prompt={prompt} 
+            setPrompt={setPrompt} 
+            handleExecute={handleExecute} 
+          />
+        ) : (
+          <motion.main 
+            key="results"
+            initial={{ opacity: 0, y: 50 }} 
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            className="pt-40 pb-32 flex flex-col items-center px-6"
+          >
+            <div className="w-full max-w-3xl space-y-16">
+              
+              {/* DYNAMIC CONTENT RENDERER */}
+              {(() => {
+                const query = prompt.toLowerCase();
 
-          // 1. CONTACT SECTION
-          if (query.includes('contact') || query.includes('email') || query.includes('hire')) {
-            return <ContactMe isDarkMode={isDarkMode} t={t} />;
-          }
+                // 1. CONTACT SECTION
+                if (query.includes('contact') || query.includes('email') || query.includes('hire')) {
+                  return <ContactMe isDarkMode={isDarkMode} t={t} />;
+                }
 
-          // 2. PROJECTS / EXPERIENCE (Default)
-          if (query.includes('project') || query.includes('work') || query.includes('exp') || prompt === "") {
-            return (
-              <section className="space-y-12">
-                <div className="space-y-4">
-                   <h3 className={`${t.text} font-mono text-xs tracking-[0.4em] uppercase`}>Deployment / Active</h3>
-                   <h2 className={`text-4xl font-bold leading-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Advanced System Architecture.</h2>
-                </div>
-                {/* Map your project data here as you did before */}
-                {/* {renderProjectCards()}  */}
-              </section>
-            );
-          }
+                // 2. PROJECTS / EXPERIENCE (Default)
+                if (query.includes('project') || query.includes('work') || query.includes('exp') || prompt === "") {
+                  return (
+                    <section className="space-y-12">
+                      <div className="space-y-4">
+                        <h3 className={`${t.text} font-mono text-xs tracking-[0.4em] uppercase`}>Deployment / Active</h3>
+                        <h2 className={`text-4xl font-bold leading-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Advanced System Architecture.</h2>
+                      </div>
+                      {/* Map your project data here as you did before */}
+                      {/* {renderProjectCards()}  */}
+                    </section>
+                  );
+                }
 
-          // 3. FALLBACK (If no keyword matches)
-          return (
-            <div className="text-center py-20">
-               <Activity size={48} className={`mx-auto mb-6 opacity-20 ${t.text}`} />
-               <h2 className={`text-2xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>No direct match found.</h2>
-               <p className="text-slate-500">The Agent couldn't find a specific section for "{prompt}". Try searching 'Projects' or 'Contact'.</p>
+                if(query.includes('chat') || query.includes('agent') || query.includes('ai')) {
+                  return (
+                    <section className="space-y-12">
+                      <div className="space-y-4">
+                        <h3 className={`${t.text} font-mono text-xs tracking-[0.4em] uppercase`}>AI Capabilities</h3>
+                        <h2 className={`text-4xl font-bold leading-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Intelligent Agent at Your Service.</h2>
+                      </div>
+                      {/* You can add more AI-related content here */}
+                      
+                    </section>
+                  );
+                }
+
+                // 3. FALLBACK (If no keyword matches)
+                return (
+                  <div className="text-center py-20">
+                    <Activity size={48} className={`mx-auto mb-6 opacity-20 ${t.text}`} />
+                    <h2 className={`text-2xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>No direct match found.</h2>
+                    <p className="text-slate-500">The Agent couldn't find a specific section for "{prompt}". Try searching 'Projects' or 'Contact'.</p>
+                  </div>
+                );
+              })()}
+
+              <div className="text-center pt-20 border-t border-white/5">
+                <button onClick={() => setView('landing')} className={`text-sm font-bold uppercase tracking-widest flex items-center gap-2 mx-auto transition-colors ${isDarkMode ? 'text-slate-500 hover:text-white' : 'text-slate-400 hover:text-slate-900'}`}>
+                  <X size={16}/> Reset Session
+                </button>
+              </div>
             </div>
-          );
-        })()}
-
-        <div className="text-center pt-20 border-t border-white/5">
-          <button onClick={() => setView('landing')} className={`text-sm font-bold uppercase tracking-widest flex items-center gap-2 mx-auto transition-colors ${isDarkMode ? 'text-slate-500 hover:text-white' : 'text-slate-400 hover:text-slate-900'}`}>
-             <X size={16}/> Reset Session
-          </button>
-        </div>
-      </div>
-    </motion.main>
-  )}
-</AnimatePresence>
+          </motion.main>
+        )}
+      </AnimatePresence>
+      <Chat />
     </div>
   );
 };
