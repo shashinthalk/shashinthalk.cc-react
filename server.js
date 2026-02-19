@@ -50,4 +50,8 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
-app.listen(3000, () => console.log('🚀 Optimized Agent on 3000'));
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(3000, () => console.log('🚀 Local Dev on http://localhost:3000'));
+}
+
+export default app;
