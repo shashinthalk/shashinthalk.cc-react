@@ -25,7 +25,7 @@ const HeroSection = ({ isDarkMode, t, prompt, setPrompt, handleExecute }: { isDa
         <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 mb-12 w-full">
           
           {/* Left: Image Container */}
-          <div className="relative group shrink-0">
+          <div className="relative group shrink-0 mt-10">
             <motion.div 
               animate={{ rotate: 360 }} 
               transition={{ duration: 15, repeat: Infinity, ease: "linear" }} 
