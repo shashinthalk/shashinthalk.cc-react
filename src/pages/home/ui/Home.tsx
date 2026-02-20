@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  X
+  X,
+  SearchX
 } from 'lucide-react';
 import { HeroSection } from '@/components/hero';
 import { NavBar } from '@/components/nav';
 import { Chat } from '@/features/chat';
+import { HOME_COMPONENT_REGISTRY } from '@/shared/component-registry';
 
 const themes: Record<string, {
     primary: string;
@@ -33,72 +35,127 @@ const HomePage = () => {
   const [prompt, setPrompt] = useState('');
   const [view, setView] = useState('landing');
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [loading, setLoading] = useState(false);
+  
+  // Store the full parsed object now instead of just an array
+  const [apiData, setApiData] = useState<any>(null);
+  
   const activeTheme = 'emerald';
   const t = themes[activeTheme];
 
-  const handleExecute = (e: { preventDefault: () => void; }) => {
-    e?.preventDefault();
-    if (!prompt) return;
-    setTimeout(() => {
-      setView('results');
-    }, 1000);
+  const handleSearch = (overridePrompt?: string) => {
+    const finalPrompt = overridePrompt || prompt;
+    if (!finalPrompt) return;
+    setPrompt(finalPrompt);
+    setApiData(null); // Clear previous
+    setLoading(true);
+    setView('results');
   };
 
+  const handleExecute = (e?: { preventDefault: () => void; }) => {
+    e?.preventDefault();
+    handleSearch();
+  };
+
+  useEffect(() => {
+    // Only trigger when loading is set to true
+    if (loading && view === 'results') {
+      const fetchContent = async () => {
+        const delay = new Promise(resolve => setTimeout(resolve, 1500));
+        
+        try {
+          const apiCall = fetch('/api/get-web-content', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              messages: [{ 
+                role: 'user', 
+                content: `Based on "${prompt}", return ONLY a JSON array` 
+              }] 
+            }),
+          });
+
+          const [response] = await Promise.all([apiCall, delay]);
+          const rawData = await response.json(); // Use .json() directly
+          setApiData(rawData);
+          
+        } catch (error) {
+          console.error("API Error:", error);
+          setApiData({ active_sections: ['none'] });
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchContent();
+    }
+    // Dependency only on loading prevents multiple calls
+  }, [loading]);
+
   return (
-    /* Changed h-screen to min-h-[100dvh] and added conditional overflow for mobile */
     <div className={`w-full transition-colors duration-700 ${isDarkMode ? 'bg-[#111827] text-slate-100' : 'bg-[#F9FAFB] text-slate-900'} font-light min-h-[100dvh] ${view === 'landing' ? 'md:h-screen md:overflow-hidden overflow-y-auto' : 'overflow-y-auto'}`}>
       
-      {/* LEFT SIDE VERTICAL NAME - Hidden on mobile */}
-      <div 
-        className="hidden md:block fixed left-6 bottom-12 z-[60] cursor-pointer select-none"
-        onClick={() => setView('landing')}
-      >
-        <h1 
-          className={`text-[15px] font-bold tracking-[0.5em] uppercase whitespace-nowrap ${isDarkMode ? 'text-white/40 hover:text-white' : 'text-slate-400 hover:text-slate-900'} transition-colors`}
-          style={{ 
-            writingMode: 'vertical-lr', 
-            transform: 'rotate(180deg)' 
-          }}
-        >
+      {/* ... Vertical Name and NavBar same as before ... */}
+      <div className="hidden md:block fixed left-6 bottom-12 z-[60] cursor-pointer select-none" onClick={() => setView('landing')}>
+        <h1 className={`text-[15px] font-bold tracking-[0.5em] uppercase whitespace-nowrap ${isDarkMode ? 'text-white/40 hover:text-white' : 'text-slate-400 hover:text-slate-900'} transition-colors`}
+          style={{ writingMode: 'vertical-lr', transform: 'rotate(180deg)' }}>
           NISHAN SHASHINTHA
         </h1>
       </div>
-
-      <NavBar isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} view={view} setView={setView} />
+      <NavBar isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} view={view} setView={setView} onSearch={handleSearch} />
 
       <AnimatePresence mode="wait">
         {view === 'landing' ? (
-          <motion.div 
-            key="landing"
-            className="flex flex-col min-h-[100dvh]" /* Ensures Hero has enough room */
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <HeroSection 
-              isDarkMode={isDarkMode} 
-              t={t} 
-              prompt={prompt} 
-              setPrompt={setPrompt} 
-              handleExecute={handleExecute} 
-            />
+          <motion.div key="landing" className="flex flex-col min-h-[100dvh]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <HeroSection isDarkMode={isDarkMode} t={t} prompt={prompt} setPrompt={setPrompt} handleExecute={handleExecute} />
           </motion.div>
         ) : (
-          <motion.main 
-            key="results"
-            initial={{ opacity: 0, y: 50 }} 
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            /* Adjusted padding-top for mobile to prevent header overlap */
+          <motion.main key="results" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -50 }}
             className="pt-32 md:pt-40 pb-20 flex flex-col items-center px-6"
           >
-            <div className="w-full max-w-3xl space-y-16 md:pl-16"> 
-              
-              {/* DYNAMIC CONTENT RENDERER LOGIC */}
-              {/* Your existing content logic goes here */}
+            <div className="w-full max-w-3xl space-y-16 md:pl-16">
+              {loading ? (
+                /* LOADING UI */
+                <div className="animate-pulse space-y-12">
+                  <div className="space-y-4">
+                    <div className={`h-3 w-32 rounded-full ${isDarkMode ? 'bg-white/10' : 'bg-slate-200'}`} />
+                    <div className={`h-10 w-3/4 rounded-xl ${isDarkMode ? 'bg-white/10' : 'bg-slate-200'}`} />
+                  </div>
+                  <div className={`h-64 w-full rounded-3xl ${isDarkMode ? 'bg-white/5' : 'bg-slate-100'}`} />
+                </div>
+              ) : (
+                <div className="w-full space-y-20">
+                  {apiData?.active_sections?.length > 0 && !apiData.active_sections.includes('none') ? (
+                    apiData.active_sections.map((key: string) => {
+                      // Check if logic exists and is set to true
+                      const isVisible = apiData.render_logic?.[key] === true;
+                      const Component = HOME_COMPONENT_REGISTRY[key];
+                      
+                      if (!Component || !isVisible) return null;
+
+                      return (
+                        <motion.div key={key} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                          <Component isDarkMode={isDarkMode} t={t} />
+                        </motion.div>
+                      );
+                    })
+                  ) : (
+                    /* FALLBACK */
+                    <div className="py-20 flex flex-col items-center text-center space-y-6">
+                      <div className={`p-6 rounded-full ${isDarkMode ? 'bg-white/5' : 'bg-slate-100'}`}>
+                        <SearchX size={40} className="opacity-20" />
+                      </div>
+                      <div className="space-y-2">
+                        <h2 className="text-2xl font-bold">No direct match found</h2>
+                        <p className="text-slate-500 max-w-sm">The agent couldn't find a specific section for "{prompt}".</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
               
               <div className="text-center pt-20 border-t border-white/5">
-                <button onClick={() => setView('landing')} className={`text-sm font-bold uppercase tracking-widest flex items-center gap-2 mx-auto transition-colors ${isDarkMode ? 'text-slate-500 hover:text-white' : 'text-slate-400 hover:text-slate-900'}`}>
+                <button onClick={() => { setView('landing'); setPrompt(''); }} 
+                  className={`text-sm font-bold uppercase tracking-widest flex items-center gap-2 mx-auto transition-colors ${isDarkMode ? 'text-slate-500 hover:text-white' : 'text-slate-400 hover:text-slate-900'}`}>
                   <X size={16}/> Reset Session
                 </button>
               </div>

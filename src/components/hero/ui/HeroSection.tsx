@@ -33,7 +33,7 @@ const HeroSection = ({ isDarkMode, t, prompt, setPrompt, handleExecute }: { isDa
             />
             <img 
               src="https://avatars.githubusercontent.com/u/45489545?v=4" 
-              className={`relative w-40 h-40 md:w-52 md:h-52 rounded-full border-4 ${isDarkMode ? 'border-[#1F2937] bg-[#1F2937]' : 'border-white bg-white shadow-xl'}`} 
+              className={`relative w-40 h-40 md:w-45 md:h-45 rounded-full border-4 ${isDarkMode ? 'border-[#1F2937] bg-[#1F2937]' : 'border-white bg-white shadow-xl'}`} 
               alt="Nishan" 
             />
           </div>
@@ -44,7 +44,7 @@ const HeroSection = ({ isDarkMode, t, prompt, setPrompt, handleExecute }: { isDa
             animate={{ y: 0, opacity: 1 }}
             className="text-center md:text-left max-w-xl"
           >
-            <h2 className={`text-4xl md:text-6xl font-bold tracking-tighter mb-4 leading-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+            <h2 className={`text-4xl uppercase md:text-5xl font-bold mb-4 leading-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
               Full Stack Developer
             </h2>
             <p className={`${isDarkMode ? 'text-slate-400' : 'text-slate-500'} text-lg md:text-xl font-light tracking-wide`}>
