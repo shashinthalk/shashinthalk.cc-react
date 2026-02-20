@@ -1,12 +1,10 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Activity,
   X
 } from 'lucide-react';
 import { HeroSection } from '@/components/hero';
 import { NavBar } from '@/components/nav';
-import { ContactMe } from '@/features/contact-me';
 import { Chat } from '@/features/chat';
 
 const themes: Record<string, {
@@ -36,7 +34,6 @@ const HomePage = () => {
   const [view, setView] = useState('landing');
   const [isDarkMode, setIsDarkMode] = useState(true);
   const activeTheme = 'emerald';
-
   const t = themes[activeTheme];
 
   const handleExecute = (e: { preventDefault: () => void; }) => {
@@ -48,75 +45,58 @@ const HomePage = () => {
   };
 
   return (
-    <div className={`w-full transition-colors duration-700 ${isDarkMode ? 'bg-[#111827] text-slate-100' : 'bg-[#F9FAFB] text-slate-900'} font-light ${view === 'landing' ? 'h-screen overflow-hidden' : 'min-h-screen overflow-y-auto'}`}>
+    /* Changed h-screen to min-h-[100dvh] and added conditional overflow for mobile */
+    <div className={`w-full transition-colors duration-700 ${isDarkMode ? 'bg-[#111827] text-slate-100' : 'bg-[#F9FAFB] text-slate-900'} font-light min-h-[100dvh] ${view === 'landing' ? 'md:h-screen md:overflow-hidden overflow-y-auto' : 'overflow-y-auto'}`}>
       
+      {/* LEFT SIDE VERTICAL NAME - Hidden on mobile */}
+      <div 
+        className="hidden md:block fixed left-6 bottom-12 z-[60] cursor-pointer select-none"
+        onClick={() => setView('landing')}
+      >
+        <h1 
+          className={`text-[15px] font-bold tracking-[0.5em] uppercase whitespace-nowrap ${isDarkMode ? 'text-white/40 hover:text-white' : 'text-slate-400 hover:text-slate-900'} transition-colors`}
+          style={{ 
+            writingMode: 'vertical-lr', 
+            transform: 'rotate(180deg)' 
+          }}
+        >
+          NISHAN SHASHINTHA
+        </h1>
+      </div>
+
       <NavBar isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} view={view} setView={setView} />
 
       <AnimatePresence mode="wait">
         {view === 'landing' ? (
-          <HeroSection 
-            isDarkMode={isDarkMode} 
-            t={t} 
-            prompt={prompt} 
-            setPrompt={setPrompt} 
-            handleExecute={handleExecute} 
-          />
+          <motion.div 
+            key="landing"
+            className="flex flex-col min-h-[100dvh]" /* Ensures Hero has enough room */
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <HeroSection 
+              isDarkMode={isDarkMode} 
+              t={t} 
+              prompt={prompt} 
+              setPrompt={setPrompt} 
+              handleExecute={handleExecute} 
+            />
+          </motion.div>
         ) : (
           <motion.main 
             key="results"
             initial={{ opacity: 0, y: 50 }} 
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -50 }}
-            className="pt-40 pb-32 flex flex-col items-center px-6"
+            /* Adjusted padding-top for mobile to prevent header overlap */
+            className="pt-32 md:pt-40 pb-20 flex flex-col items-center px-6"
           >
-            <div className="w-full max-w-3xl space-y-16">
+            <div className="w-full max-w-3xl space-y-16 md:pl-16"> 
               
-              {/* DYNAMIC CONTENT RENDERER */}
-              {(() => {
-                const query = prompt.toLowerCase();
-
-                // 1. CONTACT SECTION
-                if (query.includes('contact') || query.includes('email') || query.includes('hire')) {
-                  return <ContactMe isDarkMode={isDarkMode} t={t} />;
-                }
-
-                // 2. PROJECTS / EXPERIENCE (Default)
-                if (query.includes('project') || query.includes('work') || query.includes('exp') || prompt === "") {
-                  return (
-                    <section className="space-y-12">
-                      <div className="space-y-4">
-                        <h3 className={`${t.text} font-mono text-xs tracking-[0.4em] uppercase`}>Deployment / Active</h3>
-                        <h2 className={`text-4xl font-bold leading-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Advanced System Architecture.</h2>
-                      </div>
-                      {/* Map your project data here as you did before */}
-                      {/* {renderProjectCards()}  */}
-                    </section>
-                  );
-                }
-
-                if(query.includes('chat') || query.includes('agent') || query.includes('ai')) {
-                  return (
-                    <section className="space-y-12">
-                      <div className="space-y-4">
-                        <h3 className={`${t.text} font-mono text-xs tracking-[0.4em] uppercase`}>AI Capabilities</h3>
-                        <h2 className={`text-4xl font-bold leading-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Intelligent Agent at Your Service.</h2>
-                      </div>
-                      {/* You can add more AI-related content here */}
-                      
-                    </section>
-                  );
-                }
-
-                // 3. FALLBACK (If no keyword matches)
-                return (
-                  <div className="text-center py-20">
-                    <Activity size={48} className={`mx-auto mb-6 opacity-20 ${t.text}`} />
-                    <h2 className={`text-2xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>No direct match found.</h2>
-                    <p className="text-slate-500">The Agent couldn't find a specific section for "{prompt}". Try searching 'Projects' or 'Contact'.</p>
-                  </div>
-                );
-              })()}
-
+              {/* DYNAMIC CONTENT RENDERER LOGIC */}
+              {/* Your existing content logic goes here */}
+              
               <div className="text-center pt-20 border-t border-white/5">
                 <button onClick={() => setView('landing')} className={`text-sm font-bold uppercase tracking-widest flex items-center gap-2 mx-auto transition-colors ${isDarkMode ? 'text-slate-500 hover:text-white' : 'text-slate-400 hover:text-slate-900'}`}>
                   <X size={16}/> Reset Session

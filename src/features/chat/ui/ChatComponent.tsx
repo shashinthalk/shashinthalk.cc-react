@@ -100,7 +100,7 @@ export function ChatComponent() {
                   <div className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center border text-[10px] ${
                     m.role === 'user' ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400' : 'border-white/10 bg-white/5 text-slate-400'
                   }`}>
-                    {m.role === 'user' ? 'U' : 'AI'}
+                    {m.role === 'user' ? 'You' : 'Nishan\'s Buddy'}
                   </div>
                   <div className={`px-4 py-2.5 rounded-2xl text-[14px] leading-relaxed max-w-[80%] ${
                     m.role === 'user' 
