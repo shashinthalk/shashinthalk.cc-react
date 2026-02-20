@@ -1,16 +1,34 @@
-import { 
-  Github, Sun, Moon
-} from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Github, Sun, Moon } from 'lucide-react';
 
 export function NavBar({ isDarkMode, setIsDarkMode, view, setView }: { isDarkMode: boolean; setIsDarkMode: (value: boolean) => void; view: string; setView: (value: string) => void }) {
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  // Handle scroll detection
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Determine if we should show the background
+  // Show background if we are in 'results' view OR if the user has scrolled down
+  const showBackground = view === 'results' || isScrolled;
+
+  const navBgClasses = showBackground
+    ? isDarkMode 
+      ? 'bg-[#111827]/90 border-white/5 backdrop-blur-2xl border-b shadow-lg' 
+      : 'bg-white/90 border-black/5 shadow-sm backdrop-blur-2xl border-b'
+    : 'bg-transparent border-transparent';
+
   return (
-    <nav className={`fixed top-0 w-full z-50 flex justify-between items-center transition-all duration-500 
-      /* Reduced padding for mobile, kept original for desktop */
-      px-4 md:px-16 py-4 md:py-8 
-      ${view === 'results' ? (isDarkMode ? 'bg-[#111827]/90 border-white/5' : 'bg-white/90 border-black/5 shadow-sm') + ' backdrop-blur-2xl border-b' : 'bg-transparent'}`}>
+    <nav className={`fixed top-0 w-full z-50 flex justify-between items-center transition-all duration-300 
+      px-4 md:px-16 ${isScrolled ? 'py-3 md:py-4' : 'py-4 md:py-8'} 
+      ${navBgClasses}`}>
         
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => setView('landing')}>
-          {/* Visible on mobile, hidden on desktop/tablet */}
           <div className="block md:hidden">
             <h1 className={`text-[10px] font-bold tracking-[0.2em] uppercase leading-none ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
               NISHAN SHASHINTHA
@@ -19,7 +37,6 @@ export function NavBar({ isDarkMode, setIsDarkMode, view, setView }: { isDarkMod
         </div>
 
         <div className="flex items-center gap-3 md:gap-6">
-          {/* THEME & MODE CONTROLS - Slightly smaller for mobile */}
           <div className={`flex items-center gap-2 md:gap-4 p-1 md:p-1.5 rounded-2xl border ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/5 border-black/5'}`}>
             <button 
               onClick={() => setIsDarkMode(!isDarkMode)}
