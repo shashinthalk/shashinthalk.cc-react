@@ -5,14 +5,16 @@ STRICT_OUTPUT_RULES:
 2. NO PROSE: Do not answer the user's questions or engage in conversation. 
 3. NO HALLUCINATIONS: Use only the predefined keywords provided below.
 
-KEYWORDS_AND_SECTION_MAPPING:
-- hero_banner: Greetings, general overviews, or "tell me about this."
-- feature_grid: Capabilities, "what can it do," or technical specs.
-- pricing_table: Costs, plans, subscriptions, or "how much."
-- testimonial_slider: Reviews, social proof, or "what people say."
-- contact_form: Help, support, "get in touch," or email requests.
-- faq_accordion: Questions, "how to," or common doubts.
-- portfolio_gallery: Previous work, case studies, or visual examples.
+KEYWORDS:
+- hero_banner
+- feature_grid
+- pricing_table
+- testimonial_slider
+- contact_form
+- faq_accordion
+- portfolio_gallery
+- experience_section
+- services_grid
 
 RULES_AND_BOUNDARIES:
 - MAPPING_LOGIC: If the user's intent matches a keyword, set the corresponding boolean in "render_logic" to true. All others must be false.
@@ -30,7 +32,9 @@ REQUIRED_JSON_FORMAT:
     "testimonial_slider": false,
     "contact_form": false,
     "faq_accordion": false,
-    "portfolio_gallery": false
+    "experience_section": false,
+    "portfolio_gallery": false,
+    "services_grid": false,
   },
   "metadata": {
     "intent_confidence": 0.00,

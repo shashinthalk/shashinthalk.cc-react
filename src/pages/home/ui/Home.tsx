@@ -37,7 +37,6 @@ const HomePage = () => {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [loading, setLoading] = useState(false);
   
-  // Store the full parsed object now instead of just an array
   const [apiData, setApiData] = useState<any>(null);
   
   const activeTheme = 'emerald';
@@ -47,7 +46,7 @@ const HomePage = () => {
     const finalPrompt = overridePrompt || prompt;
     if (!finalPrompt) return;
     setPrompt(finalPrompt);
-    setApiData(null); // Clear previous
+    setApiData(null); 
     setLoading(true);
     setView('results');
   };
@@ -58,7 +57,6 @@ const HomePage = () => {
   };
 
   useEffect(() => {
-    // Only trigger when loading is set to true
     if (loading && view === 'results') {
       const fetchContent = async () => {
         const delay = new Promise(resolve => setTimeout(resolve, 1500));
@@ -76,9 +74,9 @@ const HomePage = () => {
           });
 
           const [response] = await Promise.all([apiCall, delay]);
-          const rawData = await response.json(); // Use .json() directly
+          const rawData = await response.json();
           setApiData(rawData);
-          
+
         } catch (error) {
           console.error("API Error:", error);
           setApiData({ active_sections: ['none'] });
@@ -88,13 +86,16 @@ const HomePage = () => {
       };
       fetchContent();
     }
-    // Dependency only on loading prevents multiple calls
   }, [loading]);
+
+  // Determine if there are any valid sections to show
+  const sectionsToShow = apiData?.active_sections?.filter((key: string) => 
+    apiData.render_logic?.[key] === true && HOME_COMPONENT_REGISTRY[key]
+  ) || [];
 
   return (
     <div className={`w-full transition-colors duration-700 ${isDarkMode ? 'bg-[#111827] text-slate-100' : 'bg-[#F9FAFB] text-slate-900'} font-light min-h-[100dvh] ${view === 'landing' ? 'md:h-screen md:overflow-hidden overflow-y-auto' : 'overflow-y-auto'}`}>
       
-      {/* ... Vertical Name and NavBar same as before ... */}
       <div className="hidden md:block fixed left-6 bottom-12 z-[60] cursor-pointer select-none" onClick={() => setView('landing')}>
         <h1 className={`text-[15px] font-bold tracking-[0.5em] uppercase whitespace-nowrap ${isDarkMode ? 'text-white/40 hover:text-white' : 'text-slate-400 hover:text-slate-900'} transition-colors`}
           style={{ writingMode: 'vertical-lr', transform: 'rotate(180deg)' }}>
@@ -112,9 +113,8 @@ const HomePage = () => {
           <motion.main key="results" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -50 }}
             className="pt-32 md:pt-40 pb-20 flex flex-col items-center px-6"
           >
-            <div className="w-full max-w-3xl space-y-16 md:pl-16">
+            <div className="w-full max-w-7xl space-y-16 md:pl-16">
               {loading ? (
-                /* LOADING UI */
                 <div className="animate-pulse space-y-12">
                   <div className="space-y-4">
                     <div className={`h-3 w-32 rounded-full ${isDarkMode ? 'bg-white/10' : 'bg-slate-200'}`} />
@@ -124,14 +124,9 @@ const HomePage = () => {
                 </div>
               ) : (
                 <div className="w-full space-y-20">
-                  {apiData?.active_sections?.length > 0 && !apiData.active_sections.includes('none') ? (
-                    apiData.active_sections.map((key: string) => {
-                      // Check if logic exists and is set to true
-                      const isVisible = apiData.render_logic?.[key] === true;
+                  {sectionsToShow.length > 0 ? (
+                    sectionsToShow.map((key: string) => {
                       const Component = HOME_COMPONENT_REGISTRY[key];
-                      
-                      if (!Component || !isVisible) return null;
-
                       return (
                         <motion.div key={key} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                           <Component isDarkMode={isDarkMode} t={t} />
@@ -139,7 +134,6 @@ const HomePage = () => {
                       );
                     })
                   ) : (
-                    /* FALLBACK */
                     <div className="py-20 flex flex-col items-center text-center space-y-6">
                       <div className={`p-6 rounded-full ${isDarkMode ? 'bg-white/5' : 'bg-slate-100'}`}>
                         <SearchX size={40} className="opacity-20" />
