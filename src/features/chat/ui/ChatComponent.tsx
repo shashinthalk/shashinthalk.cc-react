@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Bot, Sparkles, MessageSquare, X, Minimize2 } from 'lucide-react';
+import { Send, Bot, MessageSquare, X, Minimize2 } from 'lucide-react';
 
 /**
  * PERSONAL WEBSITE: Nishan Shashintha
@@ -44,11 +44,18 @@ export function ChatComponent() {
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
+        
         const chunk = decoder.decode(value);
+
         setMessages(prev => {
-          const updated = [...prev];
-          updated[updated.length - 1].content += chunk;
-          return updated;
+          const lastMsg = prev[prev.length - 1];
+          if (lastMsg && lastMsg.role === 'ai') {
+            return [
+              ...prev.slice(0, -1),
+              { ...lastMsg, content: lastMsg.content + chunk }
+            ];
+          }
+          return prev;
         });
       }
     } finally {
@@ -72,12 +79,8 @@ export function ChatComponent() {
             {/* Header */}
             <div className="relative z-10 px-5 py-4 border-b border-emerald-500/10 flex items-center justify-between bg-[#111827]/90 backdrop-blur-md">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-                  <Sparkles size={16} className="text-emerald-400" />
-                </div>
                 <div>
-                  <h4 className="text-sm font-bold text-white leading-none">Agent Nishan</h4>
-                  <span className="text-[9px] text-emerald-500 font-mono tracking-widest uppercase">4+ Years Exp</span>
+                  <h4 className="text-sm font-bold text-white leading-none">Nishan's AI Buddy</h4>
                 </div>
               </div>
               <button onClick={() => setIsOpen(false)} className="text-slate-500 hover:text-white transition-colors">
@@ -100,7 +103,7 @@ export function ChatComponent() {
                   <div className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center border text-[10px] ${
                     m.role === 'user' ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400' : 'border-white/10 bg-white/5 text-slate-400'
                   }`}>
-                    {m.role === 'user' ? 'You' : 'Nishan\'s Buddy'}
+                    {m.role === 'user' ? 'You' : 'AI'}
                   </div>
                   <div className={`px-4 py-2.5 rounded-2xl text-[14px] leading-relaxed max-w-[80%] ${
                     m.role === 'user' 

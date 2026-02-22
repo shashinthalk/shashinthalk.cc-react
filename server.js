@@ -1,8 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
-import chatRoutes from './routes/chatRoutes.js';
-import webPages from './routes/webPagesSelector.js';
+import chatRoutes from './routes/chat-routes.js';
+import webPages from './routes/web-pages-selector.js';
 
 const app = express();
 app.use(cors());
