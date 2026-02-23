@@ -4,10 +4,6 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Bot, MessageSquare, X, Minimize2 } from 'lucide-react';
 
-/**
- * PERSONAL WEBSITE: Nishan Shashintha
- * Floating Agent Widget (Emerald Theme)
- */
 export function ChatComponent() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{ role: 'user' | 'ai', content: string }[]>([]);
@@ -114,7 +110,7 @@ export function ChatComponent() {
                   </div>
                 </div>
               ))}
-              {isLoading && <div className="text-[10px] text-emerald-500/50 animate-pulse font-mono px-10">STREAMING_CONTENT...</div>}
+              {isLoading && <div className="text-[10px] text-emerald-500/50 animate-pulse font-mono px-10">Thinking...</div>}
             </div>
 
             {/* Input */}
