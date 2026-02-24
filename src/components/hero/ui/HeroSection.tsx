@@ -25,7 +25,7 @@ const HeroSection = ({ isDarkMode, t, prompt, setPrompt, handleExecute }: { isDa
         <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 mb-12 w-full">
           
           {/* Left: Image Container */}
-          <div className="relative group shrink-0 mt-10">
+          <div className="relative group shrink-0">
             <motion.div 
               animate={{ rotate: 360 }} 
               transition={{ duration: 15, repeat: Infinity, ease: "linear" }} 
@@ -47,8 +47,9 @@ const HeroSection = ({ isDarkMode, t, prompt, setPrompt, handleExecute }: { isDa
             <h2 className={`text-4xl uppercase md:text-5xl font-bold mb-4 leading-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
               Full Stack Developer
             </h2>
-            <p className={`${isDarkMode ? 'text-slate-400' : 'text-slate-500'} text-lg md:text-xl font-light tracking-wide`}>
-              Specializing in Agentic AI and high-performance ecosystems with <span className={isDarkMode ? 'text-white' : 'text-slate-900'}>4+ years</span> of production experience.
+            <p className={`${isDarkMode ? 'text-slate-400' : 'text-slate-500'} text-lg md:text-lg font-light tracking-wide`}>
+              Full Stack Developer with <span className={isDarkMode ? 'text-white' : 'text-slate-900'}>4+ years</span> of experience and a track record of delivering over 100 successful freelance projects.
+              Specializing in building digital tools that actually work for people, focusing on clean code, security, and intuitive design.
             </p>
           </motion.div>
         </div>
