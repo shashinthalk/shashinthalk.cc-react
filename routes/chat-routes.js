@@ -18,6 +18,7 @@ router.post('/chat', async (req, res) => {
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
 
     if (cachedItem) {
+      // Return the cached reconstructed string (Answer + UI Data)
       return res.end(cachedItem.response);
     }
 
@@ -26,46 +27,53 @@ router.post('/chat', async (req, res) => {
     const systemPrompt = fs.readFileSync(personaPath, 'utf8');
     const stream = await getChatStream(systemPrompt, messages);
 
-    console.log("LLM stream started for query:", stream);
-
     let rawFullResponse = "";
     for await (const chunk of stream) {
       if (chunk.content) rawFullResponse += chunk.content;
     }
 
-    // 3. SAFE PARSING: Use Regex to find JSON block
+    // 3. SAFE PARSING
     let mainAnswer = "";
     let extraPairs = [];
     let isOutOfScope = false;
+    let uiActionData = null;
 
     const jsonMatch = rawFullResponse.match(/\{[\s\S]*\}/);
 
     if (jsonMatch) {
       try {
         const result = JSON.parse(jsonMatch[0]);
-        mainAnswer = result.main_answer;
+        mainAnswer = result.main_answer || "I'm sorry, I couldn't process that.";
         extraPairs = result.synthetic_data || [];
         isOutOfScope = result.out_of_scope || false;
+        uiActionData = result.ui_action || null;
       } catch (e) {
-        // If JSON is malformed, use the raw text as a fallback
         mainAnswer = rawFullResponse;
       }
     } else {
-      // No JSON found at all, treat the whole response as the answer
       mainAnswer = rawFullResponse;
     }
 
-    // 4. Send the answer immediately
-    res.write(mainAnswer);
+    // 4. Construct the Final Response String for Client & Cache
+    let finalPayload = mainAnswer;
+    if (uiActionData && uiActionData.show_button) {
+      finalPayload += `|UI_DATA|${JSON.stringify(uiActionData)}`;
+    }
+
+    // Send to client
+    res.write(finalPayload);
     res.end();
 
     // 5. Background Caching
-    const tasks = [saveToCache(userQuery, mainAnswer, queryVector)];
+    // We save the 'finalPayload' so the cache includes the button logic!
+    const tasks = [saveToCache(userQuery, finalPayload, queryVector)];
 
     if (!isOutOfScope && extraPairs.length > 0) {
       const syntheticTasks = extraPairs.map(async (pair) => {
         try {
           const vec = await embeddingModel.embedQuery(pair.question);
+          // For synthetic questions, we usually only save the text answer 
+          // unless you want them to trigger buttons too.
           return saveToCache(pair.question, pair.answer, vec);
         } catch (err) { return null; }
       });

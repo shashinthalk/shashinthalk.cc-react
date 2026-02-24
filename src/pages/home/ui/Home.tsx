@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { HeroSection } from '@/components/hero';
 import { NavBar } from '@/components/nav';
-import { Chat } from '@/features/chat';
+import { ChatComponent } from '@/features/chat';
 import { HOME_COMPONENT_REGISTRY } from '@/shared/component-registry';
 
 const themes: Record<string, {
@@ -45,10 +45,16 @@ const HomePage = () => {
   const handleSearch = (overridePrompt?: string) => {
     const finalPrompt = overridePrompt || prompt;
     if (!finalPrompt) return;
+    
+    // Update the prompt state so the useEffect sees the new value
     setPrompt(finalPrompt);
     setApiData(null); 
-    setLoading(true);
+    
+    // Set view to results
     setView('results');
+    
+    // Trigger the loading state to kick off the useEffect
+    setLoading(true);
   };
 
   const handleExecute = (e?: { preventDefault: () => void; }) => {
@@ -57,12 +63,14 @@ const HomePage = () => {
   };
 
   useEffect(() => {
-    if (loading && view === 'results') {
+    // Only fetch if we are in results view and loading is active
+    if (loading && view === 'results' && prompt) {
       const fetchContent = async () => {
-        const delay = new Promise(resolve => setTimeout(resolve, 1500));
+        // Small delay for UI feel
+        const delay = new Promise(resolve => setTimeout(resolve, 800));
         
         try {
-          const apiCall = fetch('/api/get-web-content', {
+          const response = await fetch('/api/get-web-content', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
@@ -73,8 +81,8 @@ const HomePage = () => {
             }),
           });
 
-          const [response] = await Promise.all([apiCall, delay]);
           const rawData = await response.json();
+          await delay; // Wait for the minimum delay
           setApiData(rawData);
 
         } catch (error) {
@@ -86,7 +94,7 @@ const HomePage = () => {
       };
       fetchContent();
     }
-  }, [loading]);
+  }, [loading, view, prompt]);
 
   // Determine if there are any valid sections to show
   const sectionsToShow = apiData?.active_sections?.filter((key: string) => 
@@ -157,9 +165,9 @@ const HomePage = () => {
           </motion.main>
         )}
       </AnimatePresence>
-      <Chat />
+      <ChatComponent isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} view={view} setView={setView} onSearch={handleSearch} />
     </div>
   );
-};
+}; 
 
 export { HomePage };
