@@ -6,13 +6,11 @@
   "scripts": {
     "dev": "concurrently \"npm run frontend\" \"npm run backend\"",
     "frontend": "vite",
-    "backend": "node server.js",
-    "server": "node server.js",
+    "backend": "node api/index.js", 
+    "server": "node api/index.js",
     "start": "node bin/www.js",
     "build": "vite build",
-    "lint": "eslint .",
-    "vercel-build": "npm run build",
-    "preview": "vite preview"
+    "vercel-build": "npm run build"
   },
   "dependencies": {
     "@ai-sdk/langchain": "^2.0.97",
