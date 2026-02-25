@@ -7,6 +7,7 @@ import 'dotenv/config';
 // Import your custom routes
 import chatRoutes from './routes/chat-routes.js';
 import webPages from './routes/web-pages-selector.js';
+import jobInfo from './routes/render-job-info.js';
 
 // Resolve __dirname for ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -22,6 +23,7 @@ app.use(express.json());
 // Note: These must come BEFORE static file serving
 app.use('/api', chatRoutes); 
 app.use('/api', webPages); 
+app.use('/api', jobInfo); 
 
 // 2. Static File Serving
 // This serves your built React/Vite files from the /dist folder
