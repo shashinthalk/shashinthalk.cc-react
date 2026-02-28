@@ -1,0 +1,1 @@
+export { JobAnalitics } from './ui/JobAnalitics';
