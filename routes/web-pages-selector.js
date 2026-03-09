@@ -12,14 +12,30 @@ router.post('/get-web-content', async (req, res) => {
     const systemPrompt = fs.readFileSync(personaPath, 'utf8');
 
     const stream = await getChatStream(systemPrompt, messages);
-    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+
+    let fullContent = "";
+
     for await (const chunk of stream) {
-      if (chunk.content) res.write(chunk.content);
+      if (chunk.content) {
+        fullContent += chunk.content;
+      }
     }
+
+    // This regex finds the first '{' and the last '}' and grabs everything in between.
+    const jsonMatch = fullContent.match(/\{[\s\S]*\}/);
+    
+    if (jsonMatch) {
+      const cleanJson = jsonMatch[0];
+      res.write(cleanJson);
+    } else {
+      res.status(500).write(JSON.stringify({ status: "invalid", error: "AI failed to produce JSON" }));
+    }
+
     res.end();
   } catch (error) {
-    console.error("Error in /get-web-content route:", error);
-    res.status(500).send("Agent Offline.");
+    if (!res.headersSent) res.status(500).send("Agent Offline.");
   }
 });
 
