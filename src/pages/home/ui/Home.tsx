@@ -44,16 +44,12 @@ const HomePage = () => {
 
   const handleSearch = (overridePrompt?: string) => {
     const finalPrompt = overridePrompt || prompt;
-    if (!finalPrompt) return;
+    // FIX: Guard against empty prompt or concurrent loading
+    if (!finalPrompt || loading) return;
     
-    // Update the prompt state so the useEffect sees the new value
-    setPrompt(finalPrompt);
     setApiData(null); 
-    
-    // Set view to results
+    setPrompt(finalPrompt);
     setView('results');
-    
-    // Trigger the loading state to kick off the useEffect
     setLoading(true);
   };
 
@@ -63,40 +59,47 @@ const HomePage = () => {
   };
 
   useEffect(() => {
-    // Only fetch if we are in results view and loading is active
-    if (loading && view === 'results' && prompt) {
-      const fetchContent = async () => {
-        // Small delay for UI feel
-        const delay = new Promise(resolve => setTimeout(resolve, 800));
+    // FIX: Removed 'loading' from dependency array to prevent effect re-triggering itself
+    if (!loading || view !== 'results' || !prompt) return;
+    
+    const controller = new AbortController();
+    
+    const fetchContent = async () => {
+      try {
+        const response = await fetch('/api/get-web-content', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+          // FIX: Removed the "Return JSON array" instruction to let System Prompt take control
+          body: JSON.stringify({ 
+            messages: [{ role: 'user', content: prompt }] 
+          }),
+        });
+
+        const text = await response.text();
+        const rawData = JSON.parse(text);
         
-        try {
-          const response = await fetch('/api/get-web-content', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-              messages: [{ 
-                role: 'user', 
-                content: `Based on "${prompt}", return ONLY a JSON array` 
-              }] 
-            }),
-          });
-
-          const rawData = await response.json();
-          await delay; // Wait for the minimum delay
-          setApiData(rawData);
-
-        } catch (error) {
-          console.error("API Error:", error);
-          setApiData({ active_sections: ['none'] });
-        } finally {
-          setLoading(false);
+        setApiData(rawData);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          if (error.name === 'AbortError') {
+            console.log('Fetch aborted');
+          } else {
+            console.error(error.message);
+          }
+        } else {
+          console.error("An unexpected error occurred", error);
         }
-      };
-      fetchContent();
-    }
-  }, [loading, view, prompt]);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Determine if there are any valid sections to show
+    fetchContent();
+
+    return () => controller.abort();
+  }, [view, prompt]); // FIX: Only watch view and prompt changes
+
   const sectionsToShow = apiData?.active_sections?.filter((key: string) => 
     apiData.render_logic?.[key] === true && HOME_COMPONENT_REGISTRY[key]
   ) || [];
