@@ -60,34 +60,39 @@ export function NavBar({ isDarkMode, setIsDarkMode, view, setView, onSearch }: {
             <motion.div
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-md z-[110]"
+              className="fixed inset-0 z-[110]"
             />
 
             <motion.div
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className={`fixed bottom-0 left-0 right-0 z-[120] rounded-t-[2.5rem] border-t max-h-[90vh] overflow-y-auto
-                ${isDarkMode ? 'bg-[#0B111D] border-white/10' : 'bg-[#F9FAFB] border-black/5'} shadow-[0_-20px_50px_rgba(0,0,0,0.3)]`}
+              initial={{ opacity: 0, scale: 0.95, y: -8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: -8 }}
+              transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+              className={`absolute top-20 left-6 md:left-24 z-[120] rounded-2xl border w-[calc(100vw-48px)] md:w-96 overflow-hidden
+                ${isDarkMode ? 'bg-[#111827]/95 border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.4)]' : 'bg-white/95 border-black/5 shadow-[0_20px_40px_rgba(0,0,0,0.1)]'} backdrop-blur-xl`}
             >
-              {/* Handle bar */}
-              <div className="w-12 h-1.5 bg-slate-500/20 rounded-full mx-auto mt-4 mb-2 md:hidden" />
+              <div className="p-5 md:p-6">
+                <div className="space-y-8">
 
-              <div className="max-w-7xl mx-auto p-6 md:p-12">
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-10">
+                  {/* ── NAVIGATION ── */}
+                  <div className="space-y-4">
+                    <h3 className={`text-[11px] font-black tracking-[0.2em] uppercase ${isDarkMode ? 'text-white/60' : 'text-slate-500'}`}>
+                      Navigation
+                    </h3>
+                    <div className="flex flex-col gap-2">
+                      <NavButton label="Experience"  icon={<BriefcaseBusiness size={16} />} isDarkMode={isDarkMode} onClick={() => { setView('experience'); setIsOpen(false); onSearch('I would like to know about your experience.'); }} />
+                      <NavButton label="Projects"    icon={<LayoutGrid size={16} />}         isDarkMode={isDarkMode} onClick={() => { setView('projects');   setIsOpen(false); onSearch('I would like to see your projects.');         }} />
+                      <NavButton label="Blogs"       icon={<Zap size={16} />}                isDarkMode={isDarkMode} onClick={() => { setView('blogs');      setIsOpen(false); onSearch('I would like to read your blogs.');           }} />
+                      <NavButton label="Contact"     icon={<MessageSquare size={16} />}      isDarkMode={isDarkMode} onClick={() => { setView('contact');    setIsOpen(false); onSearch('I would like to contact you.');              }} />
+                    </div>
+                  </div>
 
-                  {/* ── 1. FREELANCE (col-span 4) ── */}
-                  <div className="md:col-span-4 space-y-5">
-                    {/* Section label — bumped from opacity-40 to opacity-60, text-[11px] */}
-                    <h3 className={`text-[11px] font-black tracking-[0.2em] uppercase ml-1 ${isDarkMode ? 'text-white/60' : 'text-slate-500'}`}>
+                  {/* ── FREELANCE ── */}
+                  <div className={`pt-6 border-t space-y-4 ${isDarkMode ? 'border-white/5' : 'border-black/5'}`}>
+                    <h3 className={`text-[11px] font-black tracking-[0.2em] uppercase ${isDarkMode ? 'text-white/60' : 'text-slate-500'}`}>
                       Freelance
                     </h3>
-                    {/* Subtitle — was opacity-50, bumped to opacity-70 and text-[13px] */}
-                    <p className={`text-[13px] leading-relaxed ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                      Contact me on freelance platforms
-                    </p>
-                    <div className="grid gap-3">
+                    <div className="grid gap-2">
                       <FreelanceCard
                         name="Fiverr"
                         status="Level 2 Seller"
@@ -107,63 +112,7 @@ export function NavBar({ isDarkMode, setIsDarkMode, view, setView, onSearch }: {
                     </div>
                   </div>
 
-                  {/* ── 2. NAVIGATION (col-span 3) ── */}
-                  <div className="md:col-span-3 space-y-5">
-                    <h3 className={`text-[11px] font-black tracking-[0.2em] uppercase ml-1 ${isDarkMode ? 'text-white/60' : 'text-slate-500'}`}>
-                      Navigation
-                    </h3>
-                    <div className="flex flex-col gap-2">
-                      <NavButton label="Experience"  icon={<BriefcaseBusiness size={16} />} isDarkMode={isDarkMode} onClick={() => { setView('experience'); setIsOpen(false); onSearch('I would like to know about your experience.'); }} />
-                      <NavButton label="Projects"    icon={<LayoutGrid size={16} />}         isDarkMode={isDarkMode} onClick={() => { setView('projects');   setIsOpen(false); onSearch('I would like to see your projects.');         }} />
-                      <NavButton label="Blogs"       icon={<Zap size={16} />}                isDarkMode={isDarkMode} onClick={() => { setView('blogs');      setIsOpen(false); onSearch('I would like to read your blogs.');           }} />
-                      <NavButton label="Contact"     icon={<MessageSquare size={16} />}      isDarkMode={isDarkMode} onClick={() => { setView('contact');    setIsOpen(false); onSearch('I would like to contact you.');              }} />
-                    </div>
-                  </div>
-
-                  {/* ── 3. LATEST INSIGHTS (col-span 5) ── */}
-                  <div className="md:col-span-5 space-y-5">
-                    <h3 className={`text-[11px] font-black tracking-[0.2em] uppercase ml-1 ${isDarkMode ? 'text-white/60' : 'text-slate-500'}`}>
-                      Latest Insights
-                    </h3>
-                    <div
-                      className={`p-6 rounded-3xl border group cursor-pointer transition-all duration-200
-                        ${isDarkMode
-                          ? 'bg-white/5 border-white/10 hover:border-emerald-500/30 hover:bg-white/8'
-                          : 'bg-white border-black/5 hover:border-emerald-500/20 hover:shadow-md'
-                        }`}
-                    >
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500"><BookOpen size={18} /></div>
-                        <span className="text-[11px] font-bold text-emerald-500 uppercase tracking-widest">Article</span>
-                      </div>
-                      {/* Title: was xl — kept, but contrast improved via no opacity reduction */}
-                      <h4 className={`text-[1.05rem] font-bold leading-snug mb-2 group-hover:text-emerald-500 transition-colors ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
-                        Building Scalable AI Interfaces with React & Framer Motion
-                      </h4>
-                      {/* Body: was opacity-50 — bumped to text-slate-400 / text-slate-500, text-[13px] */}
-                      <p className={`text-[13px] leading-relaxed line-clamp-2 mb-4 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                        How to handle complex state and high-performance animations in modern AI SaaS products...
-                      </p>
-                      <div className="flex items-center text-xs font-bold gap-2 text-emerald-500">
-                        READ ARTICLE <ArrowRight size={14} />
-                      </div>
-                    </div>
-                  </div>
-
                 </div>
-
-                {/* ── Footer bar ── */}
-                <div className={`mt-12 pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-6 ${isDarkMode ? 'border-white/5' : 'border-black/5'}`}>
-                  {/* Copyright — opacity-30 → explicit muted color */}
-                  <p className={`text-[11px] font-bold tracking-widest ${isDarkMode ? 'text-white/40' : 'text-slate-400'}`}>
-                    © 2026 NISHAN SHASHINTHA — ALL RIGHTS RESERVED
-                  </p>
-                  <div className="flex gap-8">
-                    <a href="#" className={`text-xs font-black hover:text-emerald-500 transition-colors uppercase tracking-widest ${isDarkMode ? 'text-white/60' : 'text-slate-500'}`}>Resume</a>
-                    <a href="#" className={`text-xs font-black hover:text-emerald-500 transition-colors uppercase tracking-widest ${isDarkMode ? 'text-white/60' : 'text-slate-500'}`}>LinkedIn</a>
-                  </div>
-                </div>
-
               </div>
             </motion.div>
           </>

@@ -118,7 +118,7 @@ const HomePage = () => {
       <AnimatePresence mode="wait">
         {view === 'landing' ? (
           <motion.div key="landing" className="flex flex-col min-h-[100dvh]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <HeroSection isDarkMode={isDarkMode} t={t} prompt={prompt} setPrompt={setPrompt} handleExecute={handleExecute} />
+            <HeroSection isDarkMode={isDarkMode} t={t} prompt={prompt} setPrompt={setPrompt} handleExecute={handleExecute} setView={setView} setIsOpen={() => {}} onSearch={handleSearch} />
           </motion.div>
         ) : (
           <motion.main key="results" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -50 }}
